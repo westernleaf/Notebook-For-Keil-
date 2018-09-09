@@ -1,0 +1,43 @@
+cmd————命令，用于使能与失能
+config————配置，比如：具体将GPIO复用成什么第二功能
+
+InitTypeDefine————初始类型定义
+InitStructure————初始结构      GPIO_InitTypeDef GPIO_InitStructure;
+                                   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+                                   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;  
+                                   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+Init————初始化(函数装配）GPIO_Init(DEBUG_USART_TX_GPIO_PORT, &GPIO_InitStructure);
+
+
+
+
+
+
+-----------------------
+外设的初始化：
+   1.开启时钟
+   2.定义结构体
+   3.装载结构体成员
+   4.调用库函数，完成初始化
+
+
+
+------------------------
+
+
+system_stm32f4xx.c    ——————371行，PLL_M设置分频因子
+
+stm32f4xx.h           ——————144行，外部晶振频率设计
+
+
+-------------------------
+
+
+32位转8位（联合体），之后再从8位转为32位：
+数组取基地址，之后强制转换称为32位指针。建议使用联合体进行读写。
+
+
+
+
+
+当串口数据丢失第一个字符的时候，在重定向函数最开始加入 USART1->SR;

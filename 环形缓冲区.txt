@@ -1,0 +1,77 @@
+定义一个结构体：
+
+typedef struct
+{
+   u16 Head;
+   u16 Tail;
+   u16 Lenght;
+   u8 Ring_Buff[RINGBUFF_LEN];
+
+}RingBuff_t;
+
+RingBuff_t ringBuff;
+
+
+结构体初始化
+
+void RingBuff_Init(void)
+{
+
+ ringBuff.Head = 0;
+ ringBuff.Tail = 0;
+ ringBuff.Lenght = 0;
+ 
+}
+
+数据的写入:
+
+u8 Write_RingBuff(u8 data)
+{
+    if(ringBuff.Lenght>=RINGBUFF_LEN)
+	{return Flase;}
+
+    ringBuff.Ring_Buff[ringBuff.Tail] = data;
+    ringBuff.Tail = (ringBuff.Tail + 1) % RINGBUFF_LEN; //防止数据发生越界访问
+    ringBuff.Lenght++;
+    return True;
+}
+
+数据的读取
+
+u8 Read_RingBuff(u8 *rData)
+{
+    if(ringBuff.Lenght <= 0)
+	{return Flase;}
+
+    *rData = ringBuff.Ring_Buff[ringBuff.Head];
+    ringBuff.Head = (ringBuff.Head + 1) % RINGBUFF_LEN;
+    ringBuff.Lenght--;
+    return True;
+}
+//如果处理速度明显低于接受速度，可以加大缓冲区，以空间来换取时间
+
+
+串口接收中断
+
+void USART1_IRQHandler(void)
+{
+    if(USART_GetITStatus(USART1,USART_IT_RXNE)!= RESET)
+	{
+	USART_ClearITPendingBit(USART1,USART_IT_RXNE);
+	Write_RingBuff(USART_ReceiveData(USART1));
+	}
+}
+
+补充宏定义
+
+#define USER_RINGBUFF 1
+#if   USER_RINGBUFF
+#define RINGBUFF_LEN  200
+#define True 1
+#define Flase 0
+
+void RingBuff_Init(void);
+u8 Write_RingBuff(u8 data);
+u8 Read_RingBuff(u8 *rData);
+
+#endif
